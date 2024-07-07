@@ -1,13 +1,26 @@
 {
-  "name": "typescript-boilerplate",
+  "name": "typescript-lock-utility",
   "version": "1.0.0",
   "author": "Michael Chien",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "description": "Typescript Lock Utility",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
     "node": "^18.18 || ^20.9 || >=21.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michael5107414/typescript-lock-utility"
+  },
+  "keywords": [
+    "lock guard",
+    "typescript 5.2",
+    "dispose",
+    "asyncDispose",
+    "RAII",
+    "resource management"
+  ],
   "scripts": {
     "prepare": "husky",
     "build": "tsc",
@@ -30,6 +43,7 @@
     "concurrently": "^8.2.2",
     "eslint": "^9.6.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-sort-class-members": "^1.20.0",
     "globals": "^15.8.0",
     "husky": "^9.0.11",
     "jest": "30.0.0-alpha.5",
