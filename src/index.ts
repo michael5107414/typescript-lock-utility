@@ -1,19 +1,38 @@
-export class TestClass {
-  status = false;
-  public RAII(): void {
-    using _ = cleanup(() => (this.status = true));
+import { Deferred } from "ts-deferred";
+
+class Mutex {
+  private locked = false;
+  private waitlist: Deferred<void>[] = [];
+
+  async lock(): Promise<void> {
+    if (this.locked) {
+      const deferred = new Deferred<void>();
+      this.waitlist.push(deferred);
+      await deferred.promise;
+    }
+    this.locked = true;
+  }
+
+  unlock(): void {
+    this.locked = false;
+    this.waitlist.shift()?.resolve();
   }
 }
 
-export function cleanup(cb: () => void): Disposable {
-  return {
-    [Symbol.dispose](): void {
-      cb();
-    },
-  };
+class LockGuard implements Disposable {
+  static async create(mutex: Mutex): Promise<LockGuard> {
+    const lock = new LockGuard(mutex);
+    await mutex.lock();
+    return lock;
+  }
+
+  private constructor(private mutex: Mutex) {
+    this.mutex = mutex;
+  }
+
+  [Symbol.dispose](): void {
+    this.mutex.unlock();
+  }
 }
 
-(() => {
-  const obj = new TestClass();
-  obj.RAII();
-})();
+export { Mutex, LockGuard };

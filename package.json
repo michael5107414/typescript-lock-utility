@@ -32,6 +32,9 @@
     "test": "jest --config=jest.config.mjs",
     "coverage": "jest --coverage --config=jest.config.mjs"
   },
+  "dependencies": {
+    "ts-deferred": "^1.0.4"
+  },
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/eslint-parser": "^7.24.7",
