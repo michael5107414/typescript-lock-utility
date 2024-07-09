@@ -75,4 +75,4 @@ class LockGuard implements Disposable {
   }
 }
 
-export { Mutex, SharedMutex, LockGuard };
+export { LockGuard, Mutex, SharedMutex };

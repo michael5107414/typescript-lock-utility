@@ -1,7 +1,8 @@
 import babelEslintParser from "@babel/eslint-parser";
 import eslintConfigPrettier from "eslint-config-prettier";
-import globals from "globals";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 import sortClassMembers from "eslint-plugin-sort-class-members";
+import globals from "globals";
 import typescriptEslint from "typescript-eslint";
 
 const sharedConfigArray = [
@@ -13,10 +14,11 @@ const sharedConfigArray = [
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    plugins: { sortClassMembers },
+    plugins: { sortClassMembers, "simple-import-sort": simpleImportSort },
     rules: {
       eqeqeq: "error",
-      "sort-imports": ["error"],
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
     },
   },
   sortClassMembers.configs["flat/recommended"],
