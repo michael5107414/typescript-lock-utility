@@ -9,6 +9,7 @@
   "engines": {
     "node": "^18.18 || ^20.9 || >=21.1"
   },
+  "packageManager": "yarn@4.3.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/michael5107414/typescript-lock-utility"
