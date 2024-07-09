@@ -1,21 +1,17 @@
-import { Deferred } from "ts-deferred";
-
 class Mutex {
   private locked = false;
-  private waitlist: Deferred<void>[] = [];
+  private waitlist: Array<() => void> = [];
 
   async lock(): Promise<void> {
     if (this.locked) {
-      const deferred = new Deferred<void>();
-      this.waitlist.push(deferred);
-      await deferred.promise;
+      await new Promise<void>((resolve) => this.waitlist.push(resolve));
     }
     this.locked = true;
   }
 
   unlock(): void {
     this.locked = false;
-    this.waitlist.shift()?.resolve();
+    this.waitlist.shift()?.();
   }
 }
 
