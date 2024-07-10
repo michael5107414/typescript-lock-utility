@@ -48,17 +48,20 @@ describe("LockGuard and SharedLockGuard with SharedMutex", () => {
 
   test("using LockGuard and SharedLockGuard in the same scope", async () => {
     const executeCnt = 2;
-    const sharedResults1 = await Promise.all(
+    const sharedResultsPromise1 = Promise.all(
       Array.from({ length: executeCnt }, asyncShared),
     );
     await sleepFor(10);
-    const exclusiveResults1 = await Promise.all(
+    const exclusiveResultsPromise1 = Promise.all(
       Array.from({ length: executeCnt }, asyncExclusive),
     );
     await sleepFor(10);
-    const sharedResults2 = await Promise.all(
+    const sharedResultsPromise2 = Promise.all(
       Array.from({ length: executeCnt }, asyncShared),
     );
+    const sharedResults2 = await sharedResultsPromise2;
+    const exclusiveResults1 = await exclusiveResultsPromise1;
+    const sharedResults1 = await sharedResultsPromise1;
     expect(sharedResults1).toEqual(
       Array.from({ length: executeCnt }, () => executeCnt),
     );

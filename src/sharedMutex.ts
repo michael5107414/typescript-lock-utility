@@ -21,7 +21,7 @@ export class SharedMutex implements SharedMutex {
   }
 
   async lockShared(): Promise<void> {
-    if (!this.isShared) {
+    if (!this.isShared || this.queue.length > 0) {
       await new Promise<void>((resolve) =>
         this.queue.push({ shared: true, resolve }),
       );
