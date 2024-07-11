@@ -1,4 +1,4 @@
-import { LockGuard, SharedLockGuard, SharedMutex } from "../src";
+import { SharedLockGuard, SharedMutex, UniqueLock } from "../src";
 import { sleepFor } from "./support/util";
 
 describe("SharedLockGuard with SharedMutex", () => {
@@ -24,7 +24,7 @@ describe("SharedLockGuard with SharedMutex", () => {
   });
 });
 
-describe("LockGuard and SharedLockGuard with SharedMutex", () => {
+describe("UniqueLock and SharedLockGuard with SharedMutex", () => {
   let mutex: SharedMutex;
   let value = 0;
 
@@ -35,7 +35,7 @@ describe("LockGuard and SharedLockGuard with SharedMutex", () => {
     return value;
   }
   async function asyncExclusive(): Promise<number> {
-    using _ = await LockGuard.create(mutex);
+    using _ = await UniqueLock.create(mutex);
     value++;
     await sleepFor(100);
     return value;
@@ -46,7 +46,7 @@ describe("LockGuard and SharedLockGuard with SharedMutex", () => {
     value = 0;
   });
 
-  test("using LockGuard and SharedLockGuard in the same scope", async () => {
+  test("using UniqueLock and SharedLockGuard in the same scope", async () => {
     const executeCnt = 2;
     const sharedResultsPromise1 = Promise.all(
       Array.from({ length: executeCnt }, asyncShared),

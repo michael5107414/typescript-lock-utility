@@ -1,12 +1,12 @@
-import { LockGuard, Mutex, SharedMutex } from "../src";
+import { Mutex, SharedMutex, UniqueLock } from "../src";
 import { sleepFor } from "./support/util";
 
-describe("LockGuard with Mutex", () => {
+describe("UniqueLock with Mutex", () => {
   let mutex: Mutex;
   let value = 0;
 
   async function asyncFunc(): Promise<number> {
-    using _ = await LockGuard.create(mutex);
+    using _ = await UniqueLock.create(mutex);
     value++;
     await sleepFor(100);
     return value;
@@ -38,12 +38,12 @@ describe("LockGuard with Mutex", () => {
   });
 });
 
-describe("LockGuard with SharedMutex", () => {
+describe("UniqueLock with SharedMutex", () => {
   let mutex: SharedMutex;
   let value = 0;
 
   async function asyncFunc(): Promise<number> {
-    using _ = await LockGuard.create(mutex);
+    using _ = await UniqueLock.create(mutex);
     value++;
     await sleepFor(100);
     return value;
