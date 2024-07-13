@@ -1,6 +1,5 @@
+import { LockStrategy } from "./lockOptions";
 import { MutexInterface } from "./mutex";
-
-type LockStrategy = "instant_lock" | "defer_lock" | "try_to_lock";
 
 export class UniqueLock implements Disposable {
   static async create(mutex: MutexInterface, strategy: LockStrategy = "instant_lock"): Promise<UniqueLock> {
@@ -24,18 +23,21 @@ export class UniqueLock implements Disposable {
 
   async lock(): Promise<void> {
     if (this.ownsLock()) {
-      throw new Error("lock twice");
+      throw new Error("lock already acquired");
     }
     await this.mutex.lock();
   }
 
   tryLock(): boolean {
+    if (this.ownsLock()) {
+      throw new Error("lock already acquired");
+    }
     return this.mutex.tryLock();
   }
 
   unlock(): void {
     if (!this.ownsLock()) {
-      throw new Error("unlock twice");
+      throw new Error("lock already released");
     }
     this.mutex.unlock();
   }
@@ -45,7 +47,7 @@ export class UniqueLock implements Disposable {
   }
 
   [Symbol.dispose](): void {
-    if (this.ownsLock) {
+    if (this.ownsLock()) {
       this.mutex.unlock();
     }
   }
