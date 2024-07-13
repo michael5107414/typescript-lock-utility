@@ -23,18 +23,21 @@ export class SharedLock implements Disposable {
 
   async lock(): Promise<void> {
     if (this.onwsLock()) {
-      throw new Error("lock twice");
+      throw new Error("lock already acquired");
     }
     await this.mutex.lockShared();
   }
 
   tryLock(): boolean {
+    if (this.onwsLock()) {
+      throw new Error("lock already acquired");
+    }
     return this.mutex.tryLockShared();
   }
 
   unlock(): void {
     if (!this.onwsLock()) {
-      throw new Error("unlock twice");
+      throw new Error("lock already released");
     }
     this.mutex.unlockShared();
   }

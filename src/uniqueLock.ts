@@ -23,18 +23,21 @@ export class UniqueLock implements Disposable {
 
   async lock(): Promise<void> {
     if (this.ownsLock()) {
-      throw new Error("lock twice");
+      throw new Error("lock already acquired");
     }
     await this.mutex.lock();
   }
 
   tryLock(): boolean {
+    if (this.ownsLock()) {
+      throw new Error("lock already acquired");
+    }
     return this.mutex.tryLock();
   }
 
   unlock(): void {
     if (!this.ownsLock()) {
-      throw new Error("unlock twice");
+      throw new Error("lock already released");
     }
     this.mutex.unlock();
   }
