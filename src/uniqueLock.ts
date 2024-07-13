@@ -1,6 +1,6 @@
 import { MutexInterface } from "./mutex";
 
-type LockStrategy = "instant_lock" | "defer_lock" | "try_to_lock";
+export type LockStrategy = "instant_lock" | "defer_lock" | "try_to_lock";
 
 export class UniqueLock implements Disposable {
   static async create(mutex: MutexInterface, strategy: LockStrategy = "instant_lock"): Promise<UniqueLock> {
@@ -45,7 +45,7 @@ export class UniqueLock implements Disposable {
   }
 
   [Symbol.dispose](): void {
-    if (this.ownsLock) {
+    if (this.ownsLock()) {
       this.mutex.unlock();
     }
   }
