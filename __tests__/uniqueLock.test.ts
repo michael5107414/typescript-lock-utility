@@ -1,76 +1,86 @@
 import { Mutex, SharedMutex, UniqueLock } from "../src";
+import { MutexInterface } from "../src/mutex";
 import { sleepFor } from "./support/util";
 
-describe("UniqueLock with Mutex", () => {
-  let mutex: Mutex;
+describe.each([
+  { description: "UniqueLock with Mutex", GenericMutex: Mutex },
+  { description: "UniqueLock with SharedMutex", GenericMutex: SharedMutex },
+])("$description", ({ GenericMutex }) => {
+  let mutex: MutexInterface;
   let value = 0;
+
+  beforeEach(() => {
+    mutex = new GenericMutex();
+    value = 0;
+  });
+
+  test("lock and unlock", async () => {
+    using lock = await UniqueLock.create(mutex);
+    expect(lock.ownsLock()).toBe(true);
+    lock.unlock();
+    expect(lock.ownsLock()).toBe(false);
+  });
+
+  test("tryLock acquired", async () => {
+    using lockInstant = await UniqueLock.create(mutex);
+    lockInstant.unlock();
+    using lockTry = await UniqueLock.create(mutex, "try_to_lock");
+    expect(lockTry.ownsLock()).toBe(true);
+  });
+
+  test("tryLock not acquired", async () => {
+    using _lockInstant = await UniqueLock.create(mutex);
+    using lockTryTo = await UniqueLock.create(mutex, "try_to_lock");
+    expect(lockTryTo.ownsLock()).toBe(false);
+  });
+
+  test("lock after acquired", async () => {
+    using lock = await UniqueLock.create(mutex);
+    expect(lock.ownsLock()).toBe(true);
+    await expect(lock.lock()).rejects.toThrow("lock already acquired");
+  });
+
+  test("tryLock after acquired", async () => {
+    using lock = await UniqueLock.create(mutex);
+    expect(lock.ownsLock()).toBe(true);
+    expect(() => lock.tryLock()).toThrow("lock already acquired");
+  });
+
+  test("unlock after released", async () => {
+    using lock = await UniqueLock.create(mutex);
+    expect(lock.ownsLock()).toBe(true);
+    lock.unlock();
+    expect(lock.ownsLock()).toBe(false);
+    expect(() => lock.unlock()).toThrow("lock already released");
+  });
+
+  test("lock with lockOptions defer_lock", async () => {
+    using lock = await UniqueLock.create(mutex, "defer_lock");
+    expect(lock.ownsLock()).toBe(false);
+    await lock.lock();
+    expect(lock.ownsLock()).toBe(true);
+  });
 
   async function asyncFunc(): Promise<number> {
     using _ = await UniqueLock.create(mutex);
     value++;
-    await sleepFor(100);
+    await sleepFor(50);
     return value;
   }
 
-  beforeEach(() => {
-    mutex = new Mutex();
-    value = 0;
-  });
-
-  test("functions do not interfere with each other", async () => {
+  test("functions execute in parallel complete in the correct order", async () => {
     const length = 5;
     const results = await Promise.all(Array.from({ length }, asyncFunc));
     expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
   });
 
-  test("functions complete in the correct order", async () => {
-    const length = 3;
-    const results = await Promise.all(Array.from({ length }, asyncFunc));
-    expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
-
-    const resultPromise = asyncFunc();
-    await sleepFor(10);
+  test("functions execute with complex senarios complete in the correct order", async () => {
+    const result1Promise = asyncFunc();
+    await sleepFor(10); // Ersure ordering
     const result2 = await asyncFunc();
-    await sleepFor(10);
-    const result1 = await resultPromise;
-    expect(result1).toBe(length + 1);
-    expect(result2).toBe(length + 2);
-  });
-});
+    const result1 = await result1Promise;
 
-describe("UniqueLock with SharedMutex", () => {
-  let mutex: SharedMutex;
-  let value = 0;
-
-  async function asyncFunc(): Promise<number> {
-    using _ = await UniqueLock.create(mutex);
-    value++;
-    await sleepFor(100);
-    return value;
-  }
-
-  beforeEach(() => {
-    mutex = new SharedMutex();
-    value = 0;
-  });
-
-  test("functions do not interfere with each other", async () => {
-    const length = 5;
-    const results = await Promise.all(Array.from({ length }, asyncFunc));
-    expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
-  });
-
-  test("functions complete in the correct order", async () => {
-    const length = 3;
-    const results = await Promise.all(Array.from({ length }, asyncFunc));
-    expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
-
-    const resultPromise = asyncFunc();
-    await sleepFor(10);
-    const result2 = await asyncFunc();
-    await sleepFor(10);
-    const result1 = await resultPromise;
-    expect(result1).toBe(length + 1);
-    expect(result2).toBe(length + 2);
+    expect(result1).toBe(1);
+    expect(result2).toBe(2);
   });
 });

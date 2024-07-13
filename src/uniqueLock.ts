@@ -6,11 +6,10 @@ export class UniqueLock implements Disposable {
     const lock = new UniqueLock(mutex);
     switch (strategy) {
       case "instant_lock":
-        await mutex.lock();
-        lock._acquired = true;
+        await lock.lock();
         break;
       case "try_to_lock":
-        lock._acquired = mutex.tryLock();
+        lock.tryLock();
     }
     return lock;
   }
@@ -24,13 +23,15 @@ export class UniqueLock implements Disposable {
       throw new Error("lock already acquired");
     }
     await this._mutex.lock();
+    this._acquired = true;
   }
 
   tryLock(): boolean {
     if (this.ownsLock()) {
       throw new Error("lock already acquired");
     }
-    return this._mutex.tryLock();
+    this._acquired = this._mutex.tryLock();
+    return this._acquired;
   }
 
   unlock(): void {
@@ -38,6 +39,7 @@ export class UniqueLock implements Disposable {
       throw new Error("lock already released");
     }
     this._mutex.unlock();
+    this._acquired = false;
   }
 
   ownsLock(): boolean {
