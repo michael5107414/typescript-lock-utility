@@ -1,6 +1,5 @@
+import { LockStrategy } from "./lockOptions";
 import { MutexInterface } from "./mutex";
-
-export type LockStrategy = "instant_lock" | "defer_lock" | "try_to_lock";
 
 export class UniqueLock implements Disposable {
   static async create(mutex: MutexInterface, strategy: LockStrategy = "instant_lock"): Promise<UniqueLock> {

@@ -1,4 +1,4 @@
 export { Mutex } from "./mutex";
-export { SharedLockGuard } from "./sharedLockGuard";
+export { SharedLock } from "./sharedLock";
 export { SharedMutex } from "./sharedMutex";
 export { UniqueLock } from "./uniqueLock";
