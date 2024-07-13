@@ -48,28 +48,16 @@ describe("UniqueLock and SharedLockGuard with SharedMutex", () => {
 
   test("using UniqueLock and SharedLockGuard in the same scope", async () => {
     const executeCnt = 2;
-    const sharedResultsPromise1 = Promise.all(
-      Array.from({ length: executeCnt }, asyncShared),
-    );
+    const sharedResultsPromise1 = Promise.all(Array.from({ length: executeCnt }, asyncShared));
     await sleepFor(10);
-    const exclusiveResultsPromise1 = Promise.all(
-      Array.from({ length: executeCnt }, asyncExclusive),
-    );
+    const exclusiveResultsPromise1 = Promise.all(Array.from({ length: executeCnt }, asyncExclusive));
     await sleepFor(10);
-    const sharedResultsPromise2 = Promise.all(
-      Array.from({ length: executeCnt }, asyncShared),
-    );
+    const sharedResultsPromise2 = Promise.all(Array.from({ length: executeCnt }, asyncShared));
     const sharedResults2 = await sharedResultsPromise2;
     const exclusiveResults1 = await exclusiveResultsPromise1;
     const sharedResults1 = await sharedResultsPromise1;
-    expect(sharedResults1).toEqual(
-      Array.from({ length: executeCnt }, () => executeCnt),
-    );
-    expect(exclusiveResults1.sort()).toEqual(
-      Array.from({ length: executeCnt }, (_, k) => executeCnt + k + 1),
-    );
-    expect(sharedResults2).toEqual(
-      Array.from({ length: executeCnt }, () => executeCnt * 3),
-    );
+    expect(sharedResults1).toEqual(Array.from({ length: executeCnt }, () => executeCnt));
+    expect(exclusiveResults1.sort()).toEqual(Array.from({ length: executeCnt }, (_, k) => executeCnt + k + 1));
+    expect(sharedResults2).toEqual(Array.from({ length: executeCnt }, () => executeCnt * 3));
   });
 });

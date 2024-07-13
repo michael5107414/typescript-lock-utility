@@ -49,9 +49,7 @@ export class SharedMutex implements SharedMutexInterface {
 
   async lock(): Promise<void> {
     if (this.isAcquired()) {
-      await new Promise<void>((resolve) =>
-        this._queue.push({ shared: false, resolve }),
-      );
+      await new Promise<void>((resolve) => this._queue.push({ shared: false, resolve }));
     } else {
       this.acquire();
     }
@@ -72,9 +70,7 @@ export class SharedMutex implements SharedMutexInterface {
 
   async lockShared(): Promise<void> {
     if ((this.isAcquired() && !this._isShared) || this._queue.length > 0) {
-      await new Promise<void>((resolve) =>
-        this._queue.push({ shared: true, resolve }),
-      );
+      await new Promise<void>((resolve) => this._queue.push({ shared: true, resolve }));
     } else {
       this.acquireShared();
     }
