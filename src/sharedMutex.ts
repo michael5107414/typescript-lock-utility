@@ -7,78 +7,91 @@ export interface SharedMutexInterface extends MutexInterface {
 }
 
 export class SharedMutex implements SharedMutexInterface {
-  private _acquired = false;
   private _acquiredCnt = 0;
+
+  /** The flag indicate whether current mutex is acquired by SharedLock. It has no meaning when _acquiredCnt is 0. */
   private _isShared = true;
   private _queue = [] as Array<{ shared: boolean; resolve: () => void }>;
 
-  async lock(): Promise<void> {
-    if (this._acquired) {
-      await new Promise<void>((resolve) =>
-        this._queue.push({ shared: false, resolve }),
-      );
-    }
-    this._acquired = true;
+  private isAcquired(): boolean {
+    return this._acquiredCnt > 0;
+  }
+
+  private acquire(): void {
     this._acquiredCnt++;
     this._isShared = false;
   }
 
-  tryLock(): boolean {
-    if (this._acquired) {
-      return false;
-    }
-    this._acquired = true;
+  private acquireShared(): void {
     this._acquiredCnt++;
-    this._isShared = false;
-    return true;
+    this._isShared = true;
   }
 
-  unlock(): void {
+  private release(): void {
     this._acquiredCnt--;
-    console.log(this._queue);
+  }
+
+  private tryDispatch(): void {
     if (this._queue.length === 0) {
-      this._isShared = true;
-      this._acquired = false;
-    } else if (!this._queue[0].shared) {
-      this._isShared = false;
+      return;
+    }
+
+    if (!this._queue[0].shared) {
+      this.acquire();
       this._queue.shift().resolve();
     } else {
-      this._isShared = true;
-      console.log(this._queue);
-      while (this._queue.length > 0 && this._queue[0].shared) {
+      while (this._queue[0]?.shared) {
+        this.acquireShared();
         this._queue.shift().resolve();
       }
     }
   }
 
+  async lock(): Promise<void> {
+    if (this.isAcquired()) {
+      await new Promise<void>((resolve) =>
+        this._queue.push({ shared: false, resolve }),
+      );
+    } else {
+      this.acquire();
+    }
+  }
+
+  tryLock(): boolean {
+    if (this.isAcquired()) {
+      return false;
+    }
+    this.acquire();
+    return true;
+  }
+
+  unlock(): void {
+    this.release();
+    this.tryDispatch();
+  }
+
   async lockShared(): Promise<void> {
-    if ((this._acquired && !this._isShared) || this._queue.length > 0) {
+    if ((this.isAcquired() && !this._isShared) || this._queue.length > 0) {
       await new Promise<void>((resolve) =>
         this._queue.push({ shared: true, resolve }),
       );
+    } else {
+      this.acquireShared();
     }
-    this._acquired = true;
-    this._acquiredCnt++;
   }
 
   tryLockShared(): boolean {
-    if ((this._acquired && !this._isShared) || this._queue.length > 0) {
+    if ((this.isAcquired() && !this._isShared) || this._queue.length > 0) {
       return false;
     }
-    this._acquired = true;
-    this._acquiredCnt++;
+    this.acquireShared();
     return true;
   }
 
   unlockShared(): void {
-    this._acquiredCnt--;
-    if (this._acquiredCnt !== 0) {
-      return;
-    } else if (this._queue.length === 0) {
-      this._acquired = false;
-    } else {
-      this._isShared = false;
-      this._queue.shift().resolve();
+    this.release();
+    if (!this.isAcquired()) {
+      this.tryDispatch();
     }
   }
 }
