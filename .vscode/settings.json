@@ -23,4 +23,5 @@
   "prettier.enableDebugLogs": true,
   "typescript.suggest.completeJSDocs": true,
   "javascript.suggest.completeJSDocs": true,
+  "typescript.tsdk": "node_modules\\typescript\\lib",
 }
