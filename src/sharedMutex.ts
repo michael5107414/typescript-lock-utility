@@ -7,15 +7,12 @@ export interface SharedMutexInterface extends MutexInterface {
 }
 
 export class SharedMutex implements SharedMutexInterface {
-  private _acquiredCnt = 0;
-
   /** The flag indicate whether current mutex is acquired by SharedLock. It has no meaning when _acquiredCnt is 0. */
   private _isShared = true;
+  private _acquiredCnt = 0;
   private _queue = [] as Array<{ shared: boolean; resolve: () => void }>;
 
-  private isAcquired(): boolean {
-    return this._acquiredCnt > 0;
-  }
+  constructor(private _sharedFirst = false) {}
 
   private acquire(): void {
     this._acquiredCnt++;
@@ -27,11 +24,19 @@ export class SharedMutex implements SharedMutexInterface {
     this._isShared = true;
   }
 
+  private canAcquire(): boolean {
+    return this._acquiredCnt === 0;
+  }
+
+  private canAcquireShared(): boolean {
+    return !((this._acquiredCnt > 0 && !this._isShared) || (!this._sharedFirst && this._queue.length > 0));
+  }
+
   private release(): void {
     this._acquiredCnt--;
   }
 
-  private tryDispatch(): void {
+  private dispatch(): void {
     if (this._queue.length === 0) {
       return;
     }
@@ -39,55 +44,65 @@ export class SharedMutex implements SharedMutexInterface {
     if (!this._queue[0].shared) {
       this.acquire();
       this._queue.shift().resolve();
+    } else if (this._sharedFirst) {
+      this._queue
+        .filter((elem) => elem.shared)
+        .forEach((elem) => {
+          this.acquireShared();
+          elem.resolve();
+        });
+      this._queue = this._queue.filter((elem) => !elem.shared);
     } else {
-      while (this._queue[0]?.shared) {
+      let firstUniqueIdx = this._queue.findIndex((elem) => !elem.shared);
+      firstUniqueIdx = firstUniqueIdx !== -1 ? firstUniqueIdx : this._queue.length;
+      this._queue.splice(0, firstUniqueIdx).forEach((elem) => {
         this.acquireShared();
-        this._queue.shift().resolve();
-      }
+        elem.resolve();
+      });
     }
   }
 
   async lock(): Promise<void> {
-    if (this.isAcquired()) {
-      await new Promise<void>((resolve) => this._queue.push({ shared: false, resolve }));
-    } else {
+    if (this.canAcquire()) {
       this.acquire();
+    } else {
+      await new Promise<void>((resolve) => this._queue.push({ shared: false, resolve }));
     }
   }
 
   tryLock(): boolean {
-    if (this.isAcquired()) {
-      return false;
+    if (this.canAcquire()) {
+      this.acquire();
+      return true;
     }
-    this.acquire();
-    return true;
+    return false;
   }
 
   unlock(): void {
     this.release();
-    this.tryDispatch();
+    this.dispatch();
   }
 
   async lockShared(): Promise<void> {
-    if ((this.isAcquired() && !this._isShared) || this._queue.length > 0) {
-      await new Promise<void>((resolve) => this._queue.push({ shared: true, resolve }));
-    } else {
+    if (this.canAcquireShared()) {
       this.acquireShared();
+    } else {
+      await new Promise<void>((resolve) => this._queue.push({ shared: true, resolve }));
     }
   }
 
   tryLockShared(): boolean {
-    if ((this.isAcquired() && !this._isShared) || this._queue.length > 0) {
-      return false;
+    if (this.canAcquireShared()) {
+      this.acquireShared();
+      return true;
     }
-    this.acquireShared();
-    return true;
+    return false;
   }
 
   unlockShared(): void {
     this.release();
-    if (!this.isAcquired()) {
-      this.tryDispatch();
+    if (this.canAcquire()) {
+      this.dispatch();
     }
   }
 }

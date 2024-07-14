@@ -17,29 +17,27 @@ export class SharedLock implements Disposable {
 
   private _acquired = false;
 
-  private constructor(private mutex: SharedMutexInterface) {
-    this.mutex = mutex;
-  }
+  private constructor(private _mutex: SharedMutexInterface) {}
 
   async lock(): Promise<void> {
     if (this.onwsLock()) {
       throw new Error("lock already acquired");
     }
-    await this.mutex.lockShared();
+    await this._mutex.lockShared();
   }
 
   tryLock(): boolean {
     if (this.onwsLock()) {
       throw new Error("lock already acquired");
     }
-    return this.mutex.tryLockShared();
+    return this._mutex.tryLockShared();
   }
 
   unlock(): void {
     if (!this.onwsLock()) {
       throw new Error("lock already released");
     }
-    this.mutex.unlockShared();
+    this._mutex.unlockShared();
   }
 
   onwsLock(): boolean {
@@ -48,7 +46,7 @@ export class SharedLock implements Disposable {
 
   [Symbol.dispose](): void {
     if (this.onwsLock()) {
-      this.mutex.unlockShared();
+      this._mutex.unlockShared();
     }
   }
 }

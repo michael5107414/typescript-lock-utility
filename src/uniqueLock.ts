@@ -17,29 +17,27 @@ export class UniqueLock implements Disposable {
 
   private _acquired = false;
 
-  private constructor(private mutex: MutexInterface) {
-    this.mutex = mutex;
-  }
+  private constructor(private _mutex: MutexInterface) {}
 
   async lock(): Promise<void> {
     if (this.ownsLock()) {
       throw new Error("lock already acquired");
     }
-    await this.mutex.lock();
+    await this._mutex.lock();
   }
 
   tryLock(): boolean {
     if (this.ownsLock()) {
       throw new Error("lock already acquired");
     }
-    return this.mutex.tryLock();
+    return this._mutex.tryLock();
   }
 
   unlock(): void {
     if (!this.ownsLock()) {
       throw new Error("lock already released");
     }
-    this.mutex.unlock();
+    this._mutex.unlock();
   }
 
   ownsLock(): boolean {
@@ -48,7 +46,7 @@ export class UniqueLock implements Disposable {
 
   [Symbol.dispose](): void {
     if (this.ownsLock()) {
-      this.mutex.unlock();
+      this._mutex.unlock();
     }
   }
 }
