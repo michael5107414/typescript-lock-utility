@@ -8,26 +8,45 @@ export class Mutex implements MutexInterface {
   private _acquired = false;
   private _queue = [] as Array<() => void>;
 
+  private acquire(): void {
+    this._acquired = true;
+  }
+
+  private canAcquire(): boolean {
+    return !this._acquired;
+  }
+
+  private release(): void {
+    this._acquired = false;
+  }
+
+  private dispatch(): void {
+    if (this._queue.length === 0) {
+      return;
+    }
+
+    this.acquire();
+    this._queue.shift()();
+  }
+
   async lock(): Promise<void> {
-    if (this._acquired) {
+    if (this.canAcquire()) {
+      this.acquire();
+    } else {
       await new Promise<void>((resolve) => this._queue.push(resolve));
     }
-    this._acquired = true;
   }
 
   tryLock(): boolean {
-    if (this._acquired) {
-      return false;
+    if (this.canAcquire()) {
+      this.acquire();
+      return true;
     }
-    this._acquired = true;
-    return true;
+    return false;
   }
 
   unlock(): void {
-    if (this._queue.length === 0) {
-      this._acquired = false;
-    } else {
-      this._queue.shift()();
-    }
+    this.release();
+    this.dispatch();
   }
 }
