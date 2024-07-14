@@ -6,11 +6,10 @@ export class SharedLock implements Disposable {
     const lock = new SharedLock(mutex);
     switch (strategy) {
       case "instant_lock":
-        await mutex.lockShared();
-        lock._acquired = true;
+        await lock.lock();
         break;
       case "try_to_lock":
-        lock._acquired = mutex.tryLockShared();
+        lock.tryLock();
     }
     return lock;
   }
@@ -24,13 +23,15 @@ export class SharedLock implements Disposable {
       throw new Error("lock already acquired");
     }
     await this._mutex.lockShared();
+    this._acquired = true;
   }
 
   tryLock(): boolean {
     if (this.onwsLock()) {
       throw new Error("lock already acquired");
     }
-    return this._mutex.tryLockShared();
+    this._acquired = this._mutex.tryLockShared();
+    return this._acquired;
   }
 
   unlock(): void {
@@ -38,6 +39,7 @@ export class SharedLock implements Disposable {
       throw new Error("lock already released");
     }
     this._mutex.unlockShared();
+    this._acquired = false;
   }
 
   onwsLock(): boolean {
