@@ -43,7 +43,7 @@ export class SharedMutex implements SharedMutexInterface {
 
     if (!this._queue[0].shared) {
       this.acquire();
-      this._queue.shift().resolve();
+      this._queue.shift()?.resolve();
     } else if (this._sharedFirst) {
       this._queue
         .filter((elem) => elem.shared)
@@ -66,7 +66,9 @@ export class SharedMutex implements SharedMutexInterface {
     if (this.canAcquire()) {
       this.acquire();
     } else {
-      await new Promise<void>((resolve) => this._queue.push({ shared: false, resolve }));
+      await new Promise<void>((resolve) => {
+        this._queue.push({ shared: false, resolve });
+      });
     }
   }
 
@@ -87,7 +89,9 @@ export class SharedMutex implements SharedMutexInterface {
     if (this.canAcquireShared()) {
       this.acquireShared();
     } else {
-      await new Promise<void>((resolve) => this._queue.push({ shared: true, resolve }));
+      await new Promise<void>((resolve) => {
+        this._queue.push({ shared: true, resolve });
+      });
     }
   }
 

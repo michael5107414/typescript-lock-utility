@@ -47,11 +47,25 @@ export default typescriptEslint.config(
     },
     rules: {
       eqeqeq: "error",
+      "comma-dangle": ["error", "only-multiline"],
+
       "prefer-const": "error",
-      "@typescript-eslint/no-floating-promises": "error",
+      "prefer-rest-params": "error",
+      "prefer-spread": "error",
+
+      "no-var": "error",
+      "no-cond-assign": ["error", "except-parens"],
+      "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-promise-executor-return": "error",
+
+      "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+
+      "@typescript-eslint/no-floating-promises": "error",
+
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
+
       "eslint-plugin-import/first": "error",
       "eslint-plugin-import/newline-after-import": "error",
       "eslint-plugin-import/no-duplicates": "error",

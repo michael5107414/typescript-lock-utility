@@ -26,14 +26,16 @@ export class Mutex implements MutexInterface {
     }
 
     this.acquire();
-    this._queue.shift()();
+    this._queue.shift()?.();
   }
 
   async lock(): Promise<void> {
     if (this.canAcquire()) {
       this.acquire();
     } else {
-      await new Promise<void>((resolve) => this._queue.push(resolve));
+      await new Promise<void>((resolve) => {
+        this._queue.push(resolve);
+      });
     }
   }
 
