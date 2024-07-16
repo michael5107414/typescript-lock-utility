@@ -51,11 +51,11 @@
     "husky": "^9.0.11",
     "jest": "30.0.0-alpha.5",
     "prettier": "^3.3.3",
-    "rimraf": "^6.0.1",
+    "rimraf": "6.0.0",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.0-alpha.42"
+    "typescript-eslint": "^8.0.0-alpha.44"
   },
   "resolutions": {
-    "glob": "^10.0.0"
+    "glob": ">=10.0.0"
   }
 }
