@@ -10,7 +10,7 @@ export class SharedMutex implements SharedMutexInterface {
   /** The flag indicate whether current mutex is acquired by SharedLock. It has no meaning when _acquiredCnt is 0. */
   private _isShared = true;
   private _acquiredCnt = 0;
-  private _queue = [] as Array<{ shared: boolean; resolve: () => void }>;
+  private _queue: Array<{ shared: boolean; resolve: () => void }> = [];
 
   constructor(private _sharedFirst = false) {}
 

@@ -1,4 +1,5 @@
 import { Mutex, ScopedLock } from "../src";
+import { MutexInterface } from "../src/mutex";
 import { sleepFor } from "./support/util";
 
 describe("UniqueLock with Mutex", () => {
@@ -55,7 +56,7 @@ describe("UniqueLock with Mutex", () => {
   });
 
   test("lock 0 mutex without error", async () => {
-    const mutexes = [];
+    const mutexes: MutexInterface[] = [];
     using _ = await ScopedLock.create(...mutexes);
   });
 });
