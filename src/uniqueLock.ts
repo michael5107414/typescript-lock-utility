@@ -3,15 +3,15 @@ import { MutexInterface } from "./mutex";
 
 export class UniqueLock implements Disposable {
   static async create(mutex: MutexInterface, strategy: LockStrategy = "instant_lock"): Promise<UniqueLock> {
-    const lock = new UniqueLock(mutex);
+    const uniqueLock = new UniqueLock(mutex);
     switch (strategy) {
       case "instant_lock":
-        await lock.lock();
+        await uniqueLock.lock();
         break;
       case "try_to_lock":
-        lock.tryLock();
+        uniqueLock.tryLock();
     }
-    return lock;
+    return uniqueLock;
   }
 
   private _acquired = false;
