@@ -57,6 +57,42 @@ describe("SharedLock with SharedMutex", () => {
     expect(lock.ownsLock()).toBe(true);
   });
 
+  test("lock with lockOptions adopt_lock", async () => {
+    {
+      using lock1 = await SharedLock.create(mutex);
+      const releasedMutex = lock1.release();
+      using lock2 = await SharedLock.create(releasedMutex, "adopt_lock");
+      expect(lock1.ownsLock()).toBe(false);
+      expect(lock2.ownsLock()).toBe(true);
+    }
+    using lock3 = await SharedLock.create(mutex);
+    expect(lock3.ownsLock()).toBe(true);
+  });
+
+  test("lock after release", async () => {
+    using lock = await SharedLock.create(mutex, "defer_lock");
+    lock.release();
+    await expect(lock.lock()).rejects.toThrow("mutex is not set");
+  });
+
+  test("tryLock after release", async () => {
+    using lock = await SharedLock.create(mutex, "defer_lock");
+    lock.release();
+    expect(() => lock.tryLock()).toThrow("mutex is not set");
+  });
+
+  test("unlock after release", async () => {
+    using lock = await SharedLock.create(mutex);
+    lock.release();
+    expect(() => lock.unlock()).toThrow("mutex is not set");
+  });
+
+  test("release twice", async () => {
+    using lock = await SharedLock.create(mutex);
+    lock.release();
+    expect(() => lock.release()).toThrow("mutex is not set");
+  });
+
   async function asyncFunc(): Promise<number> {
     using _ = await SharedLock.create(mutex);
     value++;
