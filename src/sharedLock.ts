@@ -3,15 +3,15 @@ import { SharedMutexInterface } from "./sharedMutex";
 
 export class SharedLock implements Disposable {
   static async create(mutex: SharedMutexInterface, strategy: LockStrategy = "instant_lock"): Promise<SharedLock> {
-    const lock = new SharedLock(mutex);
+    const sharedLock = new SharedLock(mutex);
     switch (strategy) {
       case "instant_lock":
-        await lock.lock();
+        await sharedLock.lock();
         break;
       case "try_to_lock":
-        lock.tryLock();
+        sharedLock.tryLock();
     }
-    return lock;
+    return sharedLock;
   }
 
   private _acquired = false;
