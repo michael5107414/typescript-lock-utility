@@ -51,7 +51,7 @@ describe.each([
     expect(lock.ownsLock()).toBe(true);
     lock.unlock();
     expect(lock.ownsLock()).toBe(false);
-    expect(() => lock.unlock()).toThrow("lock already released");
+    expect(() => lock.unlock()).toThrow("lock already freed");
   });
 
   test("lock with lockOptions defer_lock", async () => {
@@ -59,6 +59,42 @@ describe.each([
     expect(lock.ownsLock()).toBe(false);
     await lock.lock();
     expect(lock.ownsLock()).toBe(true);
+  });
+
+  test("lock with lockOptions adopt_lock", async () => {
+    {
+      using lock1 = await UniqueLock.create(mutex);
+      const releasedMutex = lock1.release();
+      using lock2 = await UniqueLock.create(releasedMutex, "adopt_lock");
+      expect(lock1.ownsLock()).toBe(false);
+      expect(lock2.ownsLock()).toBe(true);
+    }
+    using lock3 = await UniqueLock.create(mutex);
+    expect(lock3.ownsLock()).toBe(true);
+  });
+
+  test("lock after release", async () => {
+    using lock = await UniqueLock.create(mutex, "defer_lock");
+    lock.release();
+    await expect(lock.lock()).rejects.toThrow("mutex is not set");
+  });
+
+  test("tryLock after release", async () => {
+    using lock = await UniqueLock.create(mutex, "defer_lock");
+    lock.release();
+    expect(() => lock.tryLock()).toThrow("mutex is not set");
+  });
+
+  test("unlock after release", async () => {
+    using lock = await UniqueLock.create(mutex);
+    lock.release();
+    expect(() => lock.unlock()).toThrow("mutex is not set");
+  });
+
+  test("release twice", async () => {
+    using lock = await UniqueLock.create(mutex);
+    lock.release();
+    expect(() => lock.release()).toThrow("mutex is not set");
   });
 
   async function asyncFunc(): Promise<number> {
