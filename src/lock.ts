@@ -11,6 +11,8 @@ export async function lock(...mutexes: MutexInterface[]): Promise<void> {
     return;
   }
 
+  // cannot use keyword using for this case
+  // thus use const instead (Symbol.dispose won't be triggered)
   const lockList = await Promise.all([...mutexes.map((mtx) => UniqueLock.create(mtx, "defer_lock"))]);
 
   let startIdx = 0;
@@ -30,4 +32,6 @@ export async function lock(...mutexes: MutexInterface[]): Promise<void> {
       }
     }
   } while (!lockList[startIdx].ownsLock());
+
+  lockList.forEach((lk) => lk.release());
 }
