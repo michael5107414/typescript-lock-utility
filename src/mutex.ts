@@ -6,7 +6,7 @@ export interface MutexInterface {
 
 export class Mutex implements MutexInterface {
   private _acquired = false;
-  private _queue = [] as Array<() => void>;
+  private _queue: Array<() => void> = [];
 
   private acquire(): void {
     this._acquired = true;
