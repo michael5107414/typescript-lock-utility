@@ -1,4 +1,4 @@
-import { Mutex, SharedMutex, UniqueLock } from "../src";
+import { lock, Mutex, SharedMutex, UniqueLock } from "../src";
 import { MutexInterface } from "../src/mutex";
 import { sleepFor } from "./support/util";
 
@@ -118,5 +118,20 @@ describe.each([
 
     expect(result1).toBe(1);
     expect(result2).toBe(2);
+  });
+
+  test("real world scenario 1", async () => {
+    await lock(mutex);
+    using lock1 = await UniqueLock.create(mutex, "adopt_lock");
+    using lock2 = await UniqueLock.create(lock1.release(), "adopt_lock");
+
+    setTimeout(() => {
+      lock2.unlock();
+      value = 1;
+    }, 100);
+    expect(value).toBe(0);
+    using lock3 = await UniqueLock.create(mutex);
+    expect(value).toBe(1);
+    expect(lock3.ownsLock()).toBe(true);
   });
 });

@@ -246,4 +246,24 @@ describe("Mixed SharedLock and UniqueLock with SharedMutex with sharedFirst opti
     expect(sharedResult1).toBe(2);
     expect(sharedResult2).toBe(2);
   });
+
+  test("real world scenario 5", async () => {
+    const mutex = new SharedMutex();
+    using lock1 = await SharedLock.create(mutex);
+    using lock2 = await SharedLock.create(mutex);
+    using lock3 = await SharedLock.create(lock2.release(), "adopt_lock");
+    using lock4 = await SharedLock.create(lock1.release(), "adopt_lock");
+
+    setTimeout(async () => {
+      lock4.unlock();
+      value = 1;
+      await sleepFor(100);
+      lock3.unlock();
+      value = 2;
+    }, 100);
+    expect(value).toBe(0);
+    using lock5 = await UniqueLock.create(mutex);
+    expect(value).toBe(2);
+    expect(lock5.ownsLock()).toBe(true);
+  });
 });
