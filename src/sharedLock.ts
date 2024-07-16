@@ -10,44 +10,66 @@ export class SharedLock implements Disposable {
         break;
       case "try_to_lock":
         sharedLock.tryLock();
+        break;
+      case "adopt_lock":
+        sharedLock._owns = true;
     }
     return sharedLock;
   }
 
-  private _acquired = false;
+  private _mutex?: SharedMutexInterface;
+  private _owns = false;
 
-  private constructor(private _mutex: SharedMutexInterface) {}
+  private constructor(_mutex: SharedMutexInterface) {
+    this._mutex = _mutex;
+  }
 
   async lock(): Promise<void> {
-    if (this.onwsLock()) {
+    if (!this._mutex) {
+      throw new Error("mutex is not set");
+    } else if (this.ownsLock()) {
       throw new Error("lock already acquired");
     }
     await this._mutex.lockShared();
-    this._acquired = true;
+    this._owns = true;
   }
 
   tryLock(): boolean {
-    if (this.onwsLock()) {
+    if (!this._mutex) {
+      throw new Error("mutex is not set");
+    } else if (this.ownsLock()) {
       throw new Error("lock already acquired");
     }
-    this._acquired = this._mutex.tryLockShared();
-    return this._acquired;
+    this._owns = this._mutex.tryLockShared();
+    return this._owns;
   }
 
   unlock(): void {
-    if (!this.onwsLock()) {
+    if (!this._mutex) {
+      throw new Error("mutex is not set");
+    } else if (!this.ownsLock()) {
       throw new Error("lock already released");
     }
     this._mutex.unlockShared();
-    this._acquired = false;
+    this._owns = false;
   }
 
-  onwsLock(): boolean {
-    return this._acquired;
+  release(): SharedMutexInterface {
+    if (!this._mutex) {
+      throw new Error("mutex is not set");
+    }
+    const ret = this._mutex;
+    this._mutex = undefined;
+    this._owns = false;
+    return ret;
+  }
+
+  ownsLock(): boolean {
+    return this._owns;
   }
 
   [Symbol.dispose](): void {
-    if (this.onwsLock()) {
+    if (this._mutex && this.ownsLock()) {
       this._mutex.unlockShared();
     }
   }

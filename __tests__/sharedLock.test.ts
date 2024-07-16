@@ -13,48 +13,48 @@ describe("SharedLock with SharedMutex", () => {
 
   test("lock and unlock", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     lock.unlock();
-    expect(lock.onwsLock()).toBe(false);
+    expect(lock.ownsLock()).toBe(false);
   });
 
   test("tryLock acquired", async () => {
     using _lockInstant = await SharedLock.create(mutex);
     using lockTry = await SharedLock.create(mutex, "try_to_lock");
-    expect(lockTry.onwsLock()).toBe(true);
+    expect(lockTry.ownsLock()).toBe(true);
   });
 
   test("tryLock not acquired", async () => {
     using _lockInstant = await UniqueLock.create(mutex);
     using lockTryTo = await SharedLock.create(mutex, "try_to_lock");
-    expect(lockTryTo.onwsLock()).toBe(false);
+    expect(lockTryTo.ownsLock()).toBe(false);
   });
 
   test("lock after acquired", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     await expect(lock.lock()).rejects.toThrow("lock already acquired");
   });
 
   test("tryLock after acquired", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     expect(() => lock.tryLock()).toThrow("lock already acquired");
   });
 
   test("unlock after released", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     lock.unlock();
-    expect(lock.onwsLock()).toBe(false);
+    expect(lock.ownsLock()).toBe(false);
     expect(() => lock.unlock()).toThrow("lock already released");
   });
 
   test("lock with lockOptions defer_lock", async () => {
     using lock = await SharedLock.create(mutex, "defer_lock");
-    expect(lock.onwsLock()).toBe(false);
+    expect(lock.ownsLock()).toBe(false);
     await lock.lock();
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
   });
 
   async function asyncFunc(): Promise<number> {
