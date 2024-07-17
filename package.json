@@ -1,7 +1,7 @@
 {
   "name": "typescript-lock-utility",
   "version": "1.0.0",
-  "author": "Michael Chien",
+  "author": "Michael Chien <michael5107414@gmail.com>",
   "license": "MIT",
   "description": "Typescript Lock Utility",
   "main": "dist/index.js",
@@ -9,10 +9,17 @@
   "engines": {
     "node": "^18.18 || ^20.9 || >=21.1"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "packageManager": "yarn@4.3.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/michael5107414/typescript-lock-utility"
+    "url": "git+https://github.com/michael5107414/typescript-lock-utility.git"
+  },
+  "bugs": {
+    "url": "https://github.com/michael5107414/typescript-lock-utility/issues"
   },
   "keywords": [
     "lock guard",
@@ -23,7 +30,7 @@
     "resource management"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "node .husky/install.mjs",
     "build": "tsc",
     "build:release": "yarn clean && tsc -p tsconfig.release.json",
     "dev": "yarn build && node dist/index.js",
