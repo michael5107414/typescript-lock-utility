@@ -1,3 +1,4 @@
+export { ConditionVariable } from "./conditionVariable";
 export { lock } from "./lock";
 export { Mutex } from "./mutex";
 export { ScopedLock } from "./scopedLock";
