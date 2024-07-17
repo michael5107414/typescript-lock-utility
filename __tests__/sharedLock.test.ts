@@ -13,48 +13,84 @@ describe("SharedLock with SharedMutex", () => {
 
   test("lock and unlock", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     lock.unlock();
-    expect(lock.onwsLock()).toBe(false);
+    expect(lock.ownsLock()).toBe(false);
   });
 
   test("tryLock acquired", async () => {
     using _lockInstant = await SharedLock.create(mutex);
     using lockTry = await SharedLock.create(mutex, "try_to_lock");
-    expect(lockTry.onwsLock()).toBe(true);
+    expect(lockTry.ownsLock()).toBe(true);
   });
 
   test("tryLock not acquired", async () => {
     using _lockInstant = await UniqueLock.create(mutex);
     using lockTryTo = await SharedLock.create(mutex, "try_to_lock");
-    expect(lockTryTo.onwsLock()).toBe(false);
+    expect(lockTryTo.ownsLock()).toBe(false);
   });
 
   test("lock after acquired", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     await expect(lock.lock()).rejects.toThrow("lock already acquired");
   });
 
   test("tryLock after acquired", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     expect(() => lock.tryLock()).toThrow("lock already acquired");
   });
 
   test("unlock after released", async () => {
     using lock = await SharedLock.create(mutex);
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
     lock.unlock();
-    expect(lock.onwsLock()).toBe(false);
+    expect(lock.ownsLock()).toBe(false);
     expect(() => lock.unlock()).toThrow("lock already released");
   });
 
   test("lock with lockOptions defer_lock", async () => {
     using lock = await SharedLock.create(mutex, "defer_lock");
-    expect(lock.onwsLock()).toBe(false);
+    expect(lock.ownsLock()).toBe(false);
     await lock.lock();
-    expect(lock.onwsLock()).toBe(true);
+    expect(lock.ownsLock()).toBe(true);
+  });
+
+  test("lock with lockOptions adopt_lock", async () => {
+    {
+      using lock1 = await SharedLock.create(mutex);
+      const releasedMutex = lock1.release();
+      using lock2 = await SharedLock.create(releasedMutex, "adopt_lock");
+      expect(lock1.ownsLock()).toBe(false);
+      expect(lock2.ownsLock()).toBe(true);
+    }
+    using lock3 = await SharedLock.create(mutex);
+    expect(lock3.ownsLock()).toBe(true);
+  });
+
+  test("lock after release", async () => {
+    using lock = await SharedLock.create(mutex, "defer_lock");
+    lock.release();
+    await expect(lock.lock()).rejects.toThrow("mutex is not set");
+  });
+
+  test("tryLock after release", async () => {
+    using lock = await SharedLock.create(mutex, "defer_lock");
+    lock.release();
+    expect(() => lock.tryLock()).toThrow("mutex is not set");
+  });
+
+  test("unlock after release", async () => {
+    using lock = await SharedLock.create(mutex);
+    lock.release();
+    expect(() => lock.unlock()).toThrow("mutex is not set");
+  });
+
+  test("release twice", async () => {
+    using lock = await SharedLock.create(mutex);
+    lock.release();
+    expect(() => lock.release()).toThrow("mutex is not set");
   });
 
   async function asyncFunc(): Promise<number> {
@@ -209,5 +245,25 @@ describe("Mixed SharedLock and UniqueLock with SharedMutex with sharedFirst opti
     const sharedResult1 = await sharedPromise1;
     expect(sharedResult1).toBe(2);
     expect(sharedResult2).toBe(2);
+  });
+
+  test("real world scenario 5", async () => {
+    const mutex = new SharedMutex();
+    using lock1 = await SharedLock.create(mutex);
+    using lock2 = await SharedLock.create(mutex);
+    using lock3 = await SharedLock.create(lock2.release(), "adopt_lock");
+    using lock4 = await SharedLock.create(lock1.release(), "adopt_lock");
+
+    setTimeout(async () => {
+      lock4.unlock();
+      value = 1;
+      await sleepFor(100);
+      lock3.unlock();
+      value = 2;
+    }, 100);
+    expect(value).toBe(0);
+    using lock5 = await UniqueLock.create(mutex);
+    expect(value).toBe(2);
+    expect(lock5.ownsLock()).toBe(true);
   });
 });
