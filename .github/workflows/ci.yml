@@ -6,22 +6,23 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  HUSKY: 0
+
 jobs:
   lint:
     name: Lint Files
     runs-on: ubuntu-latest
-    env:
-      HUSKY: 0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 22.x
 
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Install Pacakges
+      - name: Install Packages
         run: yarn install --immutable
 
       - name: Running Lint
@@ -31,11 +32,8 @@ jobs:
     name: Test Files
     strategy:
       matrix:
-        os: [ubuntu-latest]
         node: [22.x, 20.x, "20.9", 18.x, "18.18"]
-    runs-on: ${{ matrix.os }}
-    env:
-      HUSKY: 0
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
