@@ -22,10 +22,16 @@
     "url": "https://github.com/michael5107414/typescript-lock-utility/issues"
   },
   "keywords": [
-    "lock guard",
+    "lock utility",
+    "lock",
+    "unique lock",
+    "shared lock",
+    "reader-writer lock",
+    "scoped lock",
+    "semaphore",
+    "condition variable",
     "typescript 5.2",
-    "dispose",
-    "asyncDispose",
+    "Symbol.dispose",
     "RAII",
     "resource management"
   ],
