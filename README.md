@@ -3,24 +3,34 @@
 [![Node.js version][nodejs-badge]][nodejs]
 [![TypeScript version][ts-badge]][typescript-5-2]
 
-
-This package provides a comprehensive set of utilities for lock management in TypeScript applications using TypeScript 5.2 feature Resource Management.
+This package offers a comprehensive suite of utilities for managing locks in TypeScript applications, leveraging the Resource Management feature introduced in TypeScript 5.2.
 
 ## Requirements
 
-* This module requires Node ^18.18 || ^20.9 || >=21.1 to support `Symbol.dispose`
-* This module requires Typescript >=5.2 to support the keyword `using`
+- Node.js version ^18.18, ^20.9, or >=21.1 is required to support `Symbol.dispose`.
+- TypeScript version >=5.2 is required for using the `using` keyword.
 
 ## Installation
 
-```
+```bash
 npm install typescript-lock-utility
 ```
 
 ## Features
 
+### Table of Contents
+
+- [UniqueLock](#uniquelock)
+- [SharedLock](#sharedlock)
+- [Reader-Writer Lock](#reader-writer-lock)
+- [ScopedLock](#scopedlock)
+- [Semaphore](#semaphore)
+- [ConditionVariable](#conditionvariable)
+- [lock](#lock)
+
 ### UniqueLock
 
+Ensures exclusive access to a resource.
 ```typescript
 // Sample code
 class TestClass {
@@ -48,13 +58,14 @@ function leaved
 
 ### SharedLock
 
+Allows multiple concurrent accesses.
 ```typescript
 // Sample code
 class TestClass {
   private mutex = new SharedMutex();
 
   async function func(): Promise<void> {
-    using _ = await UniqueLock.create(this.mutex);
+    using _ = await SharedLock.create(this.mutex);
     console.log('function entered');
     // execute for a period of time
     console.log('function leaved');
@@ -73,26 +84,28 @@ function leaved
 function leaved
 ```
 
-### Reader-Writer Lock (use the combination of UniqueLock and SharedLock)
+### Reader-Writer Lock
 
+Combines UniqueLock and SharedLock for efficient read-write access.
 ```typescript
 // Sample code
 class TestClass {
-  private mutex = new SharedMutex(); // new SharedMutex(true) for lockShared() with higher priority
+  // When using new SharedMutex(true), lockShared() will be given higher priority over lock().
+  private mutex = new SharedMutex();
 
   async function read(): Promise<void> {
     using _ = await UniqueLock.create(this.mutex);
     console.log('function read entered');
     // execute for a period of time
     console.log('function read leaved');
-  } // when read finished, the lock would automatically released.
+  }
 
   async function write(): Promise<void> {
     using _ = await UniqueLock.create(this.mutex);
     console.log('function write entered');
     // execute for a period of time
     console.log('function write leaved');
-  } // when write finished, the lock would automatically released.
+  }
 }
 
 const obj = new TestClass();
@@ -117,6 +130,7 @@ function read leaved
 
 ### ScopedLock
 
+Manages multiple locks within the same scope.
 ```typescript
 // Sample code
 class TestClass {
@@ -128,21 +142,21 @@ class TestClass {
     console.log('function func1 entered');
     // execute for a period of time
     console.log('function func1 leaved');
-  } // when func1 finished, the lock would automatically released.
+  }
 
   async function func2(): Promise<void> {
     using _ = await ScopedLock.create(this.mutex2);
     console.log('function func2 entered');
     // execute for a period of time
     console.log('function func2 leaved');
-  } // when func2 finished, the lock would automatically released.
+  }
 
   async function func12(): Promise<void> {
     using _ = await ScopedLock.create(this.mutex1, this.mutex2);
     console.log('function func12 entered');
     // execute for a period of time
     console.log('function func12 leaved');
-  } // when func12 finished, the lock would automatically released.
+  }
 }
 
 const obj = new TestClass();
@@ -164,6 +178,7 @@ function func2 leaved
 
 ### Semaphore
 
+Controls access to a resource based on the number of available permits.
 ```typescript
 // Sample code
 class TestClass {
@@ -203,6 +218,7 @@ execute func2
 
 ### ConditionVariable
 
+Synchronizes async functions based on fulfilling a condition.
 ```typescript
 // Sample code
 class TestClass {
@@ -235,6 +251,26 @@ obj.func2();
 execute func2
 execute func1
 ```
+
+### lock
+
+
+```typescript
+// Sample code
+class TestClass {
+  private mutex1 = new Mutex();
+  private mutex2 = new Mutex();
+
+  async function func(): Promise<void> {
+    await lock(mutex1, mutex2);
+    using _1 = await UniqueLock.create(mutex1, 'defer_lock');
+    using _2 = await UniqueLock.create(mutex2, 'defer_lock');
+    // equivalent to
+    // using _ = await ScopedLock.create(this.mutex1, this.mutex2);
+  }
+}
+```
+
 
 [ts-badge]: https://img.shields.io/badge/TypeScript-5.2-blue.svg
 [typescript-5-2]: https://devblogs.microsoft.com/typescript/announcing-typescript-5-2/
