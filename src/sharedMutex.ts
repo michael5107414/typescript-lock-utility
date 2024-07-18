@@ -12,6 +12,9 @@ export class SharedMutex implements SharedMutexInterface {
   private _acquiredCnt = 0;
   private _queue: Array<{ shared: boolean; resolve: () => void }> = [];
 
+  /**
+   * @param _sharedFirst Whether to give priority to lockShared over lock. Defaults to false.
+   */
   constructor(private _sharedFirst = false) {}
 
   private acquire(): void {
@@ -62,6 +65,10 @@ export class SharedMutex implements SharedMutexInterface {
     }
   }
 
+  /**
+   * Lock the mutex exclusively.
+   * If the mutex is already locked, the caller will be blocked until the mutex is unlocked.
+   */
   async lock(): Promise<void> {
     if (this.canAcquire()) {
       this.acquire();
@@ -72,6 +79,11 @@ export class SharedMutex implements SharedMutexInterface {
     }
   }
 
+  /**
+   * Try to lock the mutex exclusively.
+   * If the mutex is already locked, the caller will not be blocked.
+   * @returns true if the mutex is locked successfully, false otherwise.
+   */
   tryLock(): boolean {
     if (this.canAcquire()) {
       this.acquire();
@@ -80,11 +92,18 @@ export class SharedMutex implements SharedMutexInterface {
     return false;
   }
 
+  /**
+   * Unlock the mutex.
+   */
   unlock(): void {
     this.release();
     this.dispatch();
   }
 
+  /**
+   * Lock the mutex in shared mode.
+   * If the mutex is already locked in exclusive mode, the caller will be blocked until the mutex is unlocked.
+   */
   async lockShared(): Promise<void> {
     if (this.canAcquireShared()) {
       this.acquireShared();
@@ -95,6 +114,11 @@ export class SharedMutex implements SharedMutexInterface {
     }
   }
 
+  /**
+   * Try to lock the mutex in shared mode.
+   * If the mutex is already locked in exclusive mode, the caller will not be blocked.
+   * @returns true if the mutex is locked successfully, false otherwise.
+   */
   tryLockShared(): boolean {
     if (this.canAcquireShared()) {
       this.acquireShared();
@@ -103,6 +127,9 @@ export class SharedMutex implements SharedMutexInterface {
     return false;
   }
 
+  /**
+   * Unlock the mutex in shared mode.
+   */
   unlockShared(): void {
     this.release();
     if (this.canAcquire()) {

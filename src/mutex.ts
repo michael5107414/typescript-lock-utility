@@ -29,6 +29,10 @@ export class Mutex implements MutexInterface {
     this._queue.shift()?.();
   }
 
+  /**
+   * Lock the mutex.
+   * If the mutex is already locked, the caller will be blocked until the mutex is unlocked.
+   */
   async lock(): Promise<void> {
     if (this.canAcquire()) {
       this.acquire();
@@ -39,6 +43,11 @@ export class Mutex implements MutexInterface {
     }
   }
 
+  /**
+   * Try to lock the mutex.
+   * If the mutex is already locked, the caller will not be blocked.
+   * @returns true if the mutex is locked successfully, false otherwise.
+   */
   tryLock(): boolean {
     if (this.canAcquire()) {
       this.acquire();
@@ -47,6 +56,9 @@ export class Mutex implements MutexInterface {
     return false;
   }
 
+  /**
+   * Unlock the mutex.
+   */
   unlock(): void {
     this.release();
     this.dispatch();
