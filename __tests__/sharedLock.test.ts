@@ -42,12 +42,12 @@ describe("SharedLock with SharedMutex", () => {
     expect(() => lock.tryLock()).toThrow("lock already acquired");
   });
 
-  test("unlock after released", async () => {
+  test("unlock after freed", async () => {
     using lock = await SharedLock.create(mutex);
     expect(lock.ownsLock()).toBe(true);
     lock.unlock();
     expect(lock.ownsLock()).toBe(false);
-    expect(() => lock.unlock()).toThrow("lock already released");
+    expect(() => lock.unlock()).toThrow("lock already freed");
   });
 
   test("lock with lockOptions defer_lock", async () => {

@@ -46,7 +46,7 @@ describe.each([
     expect(() => lock.tryLock()).toThrow("lock already acquired");
   });
 
-  test("unlock after released", async () => {
+  test("unlock after freed", async () => {
     using lock = await UniqueLock.create(mutex);
     expect(lock.ownsLock()).toBe(true);
     lock.unlock();
