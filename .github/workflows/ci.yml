@@ -3,8 +3,22 @@ name: CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - ".github/workflows/ci.yml"
+      - "src/**"
+      - "__tests__/**"
+      - "eslint.config.mjs"
+      - "jest.config.mjs"
+      - "tsconfig.json"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - ".github/workflows/ci.yml"
+      - "src/**"
+      - "__tests__/**"
+      - "eslint.config.mjs"
+      - "jest.config.mjs"
+      - "tsconfig.json"
 
 env:
   HUSKY: 0
