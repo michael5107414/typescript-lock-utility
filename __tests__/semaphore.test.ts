@@ -27,6 +27,11 @@ describe("Semaphore (basic usage)", () => {
     semaphore.release();
     expect(semaphore.tryAcquire()).toBe(true);
   });
+
+  test("release with invalid update", async () => {
+    expect(() => semaphore.release(-1)).toThrow("update must be a non-negative integer");
+    expect(() => semaphore.release(1.5)).toThrow("update must be a non-negative integer");
+  });
 });
 
 describe("Semaphore (advanced usage)", () => {
