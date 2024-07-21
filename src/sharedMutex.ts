@@ -1,5 +1,8 @@
 import { SharedMutexInterface } from "./types";
 
+/**
+ * SharedMutex is a synchronization primitive that allows multiple callers to lock it in shared mode or only one caller to lock it in exclusive mode.
+ */
 export class SharedMutex implements SharedMutexInterface {
   /** The flag indicate whether current mutex is acquired by SharedLock. It has no meaning when _acquiredCnt is 0. */
   private _isShared = true;

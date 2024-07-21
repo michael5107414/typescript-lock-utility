@@ -1,6 +1,9 @@
 import { LockStrategy } from "./lockOptions";
 import { SharedMutexInterface } from "./types";
 
+/**
+ * SharedLock is a synchronization primitive that allows multiple callers to lock a shared resource.
+ */
 export class SharedLock implements Disposable {
   /**
    * Creates a new SharedLock instance and acquires the lock according to the specified strategy.

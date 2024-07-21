@@ -1,3 +1,6 @@
+/**
+ * Semaphore is a synchronization primitive that can be used to control access to a common resource.
+ */
 export class Semaphore {
   private _queue: Array<() => void> = [];
 

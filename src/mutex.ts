@@ -1,5 +1,8 @@
 import { MutexInterface } from "./types";
 
+/**
+ * Mutex is a synchronization primitive that allows only one caller to lock it.
+ */
 export class Mutex implements MutexInterface {
   private _acquired = false;
   private _queue: Array<() => void> = [];

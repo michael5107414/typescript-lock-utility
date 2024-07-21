@@ -1,6 +1,9 @@
 import { LockStrategy } from "./lockOptions";
 import { MutexInterface } from "./types";
 
+/**
+ * UniqueLock is a synchronization primitive that allows only one caller to lock it.
+ */
 export class UniqueLock implements Disposable {
   /**
    * Creates a new UniqueLock instance and acquires the lock according to the specified strategy.

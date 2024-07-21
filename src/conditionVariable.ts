@@ -1,5 +1,8 @@
 import { BasicLockableInteface } from "./types";
 
+/**
+ * ConditionVariable is a synchronization primitive that allows caller to wait until a particular condition is met.
+ */
 export class ConditionVariable {
   private _queue: Array<() => void> = [];
 
