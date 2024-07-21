@@ -1,4 +1,4 @@
-import { MutexInterface } from "./mutex";
+import { MutexInterface } from "./types";
 import { UniqueLock } from "./uniqueLock";
 
 /**

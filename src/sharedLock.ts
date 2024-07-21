@@ -1,5 +1,5 @@
 import { LockStrategy } from "./lockOptions";
-import { SharedMutexInterface } from "./sharedMutex";
+import { SharedMutexInterface } from "./types";
 
 export class SharedLock implements Disposable {
   /**

@@ -1,5 +1,5 @@
 import { lock, Mutex, SharedMutex, UniqueLock } from "../src";
-import { MutexInterface } from "../src/mutex";
+import { MutexInterface } from "../src/types";
 import { sleepFor } from "./support/util";
 
 describe.each([

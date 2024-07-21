@@ -1,5 +1,5 @@
 import { lock } from "./lock";
-import { MutexInterface } from "./mutex";
+import { MutexInterface } from "./types";
 
 export class ScopedLock implements Disposable {
   /**

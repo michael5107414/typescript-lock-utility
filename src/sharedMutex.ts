@@ -1,10 +1,4 @@
-import { MutexInterface } from "./mutex";
-
-export interface SharedMutexInterface extends MutexInterface {
-  lockShared(): Promise<void>;
-  tryLockShared(): boolean;
-  unlockShared(): void;
-}
+import { SharedMutexInterface } from "./types";
 
 export class SharedMutex implements SharedMutexInterface {
   /** The flag indicate whether current mutex is acquired by SharedLock. It has no meaning when _acquiredCnt is 0. */
