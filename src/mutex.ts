@@ -1,8 +1,4 @@
-export interface MutexInterface {
-  lock(): Promise<void>;
-  tryLock(): boolean;
-  unlock(): void;
-}
+import { MutexInterface } from "./types";
 
 export class Mutex implements MutexInterface {
   private _acquired = false;

@@ -1,4 +1,4 @@
-import { UniqueLock } from "./uniqueLock";
+import { BasicLockableInteface } from "./types";
 
 export class ConditionVariable {
   private _queue: Array<() => void> = [];
@@ -12,7 +12,7 @@ export class ConditionVariable {
     this._queue = [];
   }
 
-  async wait(lock: UniqueLock, predicate?: () => boolean | Promise<boolean>): Promise<void> {
+  async wait(lock: BasicLockableInteface, predicate?: () => boolean | Promise<boolean>): Promise<void> {
     if (!lock.ownsLock()) {
       throw new Error("lock should own the lock by calling wait");
     }

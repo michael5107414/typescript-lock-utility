@@ -1,5 +1,5 @@
 import { LockStrategy } from "./lockOptions";
-import { MutexInterface } from "./mutex";
+import { MutexInterface } from "./types";
 
 export class UniqueLock implements Disposable {
   /**
