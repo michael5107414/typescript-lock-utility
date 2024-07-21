@@ -1,5 +1,5 @@
-import { LockStrategy } from "./lockOptions";
-import { SharedMutexInterface } from "./types";
+import type { LockStrategy } from "./lockOptions";
+import type { SharedMutexInterface } from "./types";
 
 /**
  * SharedLock is a synchronization primitive that allows multiple callers to lock a shared resource.

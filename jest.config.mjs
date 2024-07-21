@@ -5,7 +5,7 @@ export default {
   testEnvironment: "node",
   testMatch: ["<rootDir>/__tests__/**/*.test.[jt]s"],
   collectCoverageFrom: ["<rootDir>/src/**/*.{ts,js}"],
-  coveragePathIgnorePatterns: ["<rootDir>/src/lockOptions.ts"],
+  coveragePathIgnorePatterns: ["<rootDir>/src/lockOptions.ts", "<rootDir>/src/types.ts"],
   coverageProvider: "v8",
   coverageDirectory: "coverage",
 };

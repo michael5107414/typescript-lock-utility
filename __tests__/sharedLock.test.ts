@@ -1,5 +1,5 @@
 import { SharedLock, SharedMutex, UniqueLock } from "../src";
-import { SharedMutexInterface } from "../src/sharedMutex";
+import type { SharedMutexInterface } from "../src/types";
 import { sleepFor } from "./support/util";
 
 describe("SharedLock with SharedMutex", () => {

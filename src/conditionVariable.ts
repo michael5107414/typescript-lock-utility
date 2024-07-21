@@ -1,4 +1,4 @@
-import { BasicLockableInteface } from "./types";
+import type { BasicLockableInteface } from "./types";
 
 /**
  * ConditionVariable is a synchronization primitive that allows caller to wait until a particular condition is met.

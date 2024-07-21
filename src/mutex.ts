@@ -1,4 +1,4 @@
-import { MutexInterface } from "./types";
+import type { MutexInterface } from "./types";
 
 /**
  * Mutex is a synchronization primitive that allows only one caller to lock it.

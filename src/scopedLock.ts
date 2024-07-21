@@ -1,5 +1,5 @@
 import { lock } from "./lock";
-import { MutexInterface } from "./types";
+import type { MutexInterface } from "./types";
 
 /**
  * ScopedLock is a synchronization primitive that provides a convenient RAII-style mechanism for owning a mutex for the duration of a scoped block.

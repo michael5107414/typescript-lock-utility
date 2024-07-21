@@ -1,5 +1,5 @@
 import { Mutex, ScopedLock } from "../src";
-import { MutexInterface } from "../src/types";
+import type { MutexInterface } from "../src/types";
 import { sleepFor } from "./support/util";
 
 describe("UniqueLock with Mutex", () => {

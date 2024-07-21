@@ -3,7 +3,6 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginImport from "eslint-plugin-import";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import sortClassMembers from "eslint-plugin-sort-class-members";
-import globals from "globals";
 import typescriptEslint from "typescript-eslint";
 
 export default typescriptEslint.config(
@@ -11,27 +10,7 @@ export default typescriptEslint.config(
     ignores: ["coverage/*", "dist/*", "node_modules/*"],
   },
   {
-    files: ["*.{js,mjs,ts,mts}", "src/**/*.{js,mjs,ts,mts}"],
-    languageOptions: {
-      parserOptions: {
-        globals: {
-          ...globals.node,
-          ...globals.es2022,
-        },
-      },
-    },
-  },
-  {
-    files: ["__tests__/**/*.{js,mjs,ts,mts}"],
-    languageOptions: {
-      parserOptions: {
-        globals: {
-          ...globals.jest,
-        },
-      },
-    },
-  },
-  {
+    files: ["{.,src/**,__tests__/**}/*.{js,mjs,ts,mts}"],
     languageOptions: {
       parser: typescriptEslint.parser,
       parserOptions: {
@@ -62,6 +41,7 @@ export default typescriptEslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
 
       "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "separate-type-imports" }],
 
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",

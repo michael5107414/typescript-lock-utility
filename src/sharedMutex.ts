@@ -1,4 +1,4 @@
-import { SharedMutexInterface } from "./types";
+import type { SharedMutexInterface } from "./types";
 
 /**
  * SharedMutex is a synchronization primitive that allows multiple callers to lock it in shared mode or only one caller to lock it in exclusive mode.
