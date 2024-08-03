@@ -31,6 +31,7 @@ npm install typescript-lock-utility
 ### UniqueLock
 
 Ensures exclusive access to a resource.
+
 ```typescript
 // Sample code
 class TestClass {
@@ -59,6 +60,7 @@ function leaved
 ### SharedLock
 
 Allows multiple concurrent accesses.
+
 ```typescript
 // Sample code
 class TestClass {
@@ -87,6 +89,7 @@ function leaved
 ### Reader-Writer Lock
 
 Combines UniqueLock and SharedLock for efficient read-write access.
+
 ```typescript
 // Sample code
 class TestClass {
@@ -131,6 +134,7 @@ function read leaved
 ### ScopedLock
 
 Manages multiple locks within the same scope.
+
 ```typescript
 // Sample code
 class TestClass {
@@ -179,6 +183,7 @@ function func2 leaved
 ### Semaphore
 
 Controls access to a resource based on the number of available permits.
+
 ```typescript
 // Sample code
 class TestClass {
@@ -219,6 +224,7 @@ execute func2
 ### ConditionVariable
 
 Synchronizes async functions based on fulfilling a condition.
+
 ```typescript
 // Sample code
 class TestClass {
@@ -229,12 +235,12 @@ class TestClass {
   async func1(): Promise<void> {
     using lk = await UniqueLock.create(this.mutex);
     await this.cv.wait(lk, () => this.flag);
-    console.log('execute func1');
+    console.log("execute func1");
   }
 
   async func2(): Promise<void> {
     // execute for a period of time
-    console.log('execute func2');
+    console.log("execute func2");
     this.flag = true;
     this.cv.notifyOne();
   }
@@ -254,7 +260,6 @@ execute func1
 
 ### lock
 
-
 ```typescript
 // Sample code
 class TestClass {
@@ -270,7 +275,6 @@ class TestClass {
   }
 }
 ```
-
 
 [ts-badge]: https://img.shields.io/badge/TypeScript-5.2-blue.svg
 [typescript-5-2]: https://devblogs.microsoft.com/typescript/announcing-typescript-5-2/

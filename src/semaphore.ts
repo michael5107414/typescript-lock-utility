@@ -41,7 +41,7 @@ export class Semaphore {
    */
   release(update = 1): void {
     if (update < 0 || !Number.isInteger(update)) {
-      throw new Error("update must be a non-negative integer");
+      throw new Error('update must be a non-negative integer');
     }
 
     this._desired += update;

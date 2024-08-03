@@ -1,6 +1,6 @@
-import { Semaphore } from "../src";
+import { Semaphore } from '../src';
 
-describe("Semaphore (basic usage)", () => {
+describe('Semaphore (basic usage)', () => {
   let semaphore: Semaphore;
   let val = 0;
 
@@ -15,26 +15,26 @@ describe("Semaphore (basic usage)", () => {
     semaphore.release();
   }
 
-  test("acquire and release", async () => {
+  test('acquire and release', async () => {
     void func1();
     await func1();
     expect(val).toBe(2);
   });
 
-  test("tryAcquire", async () => {
+  test('tryAcquire', () => {
     expect(semaphore.tryAcquire()).toBe(true);
     expect(semaphore.tryAcquire()).toBe(false);
     semaphore.release();
     expect(semaphore.tryAcquire()).toBe(true);
   });
 
-  test("release with invalid update", async () => {
-    expect(() => semaphore.release(-1)).toThrow("update must be a non-negative integer");
-    expect(() => semaphore.release(1.5)).toThrow("update must be a non-negative integer");
+  test('release with invalid update', () => {
+    expect(() => semaphore.release(-1)).toThrow('update must be a non-negative integer');
+    expect(() => semaphore.release(1.5)).toThrow('update must be a non-negative integer');
   });
 });
 
-describe("Semaphore (advanced usage)", () => {
+describe('Semaphore (advanced usage)', () => {
   let sem1: Semaphore;
   let sem2: Semaphore;
   let sem3: Semaphore;
@@ -63,7 +63,7 @@ describe("Semaphore (advanced usage)", () => {
     sem1.release();
   }
 
-  test("ensure execution order", async () => {
+  test('ensure execution order', async () => {
     const results: number[] = [];
 
     await Promise.all([func1(() => results.push(1)), func2(() => results.push(2)), func3(() => results.push(3))]);

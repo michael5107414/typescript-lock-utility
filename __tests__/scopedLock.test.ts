@@ -1,8 +1,8 @@
-import { Mutex, ScopedLock } from "../src";
-import type { MutexInterface } from "../src/types";
-import { sleepFor } from "./support/util";
+import { Mutex, ScopedLock } from '../src';
+import type { MutexInterface } from '../src/types';
+import { sleepFor } from './support/util';
 
-describe("UniqueLock with Mutex", () => {
+describe('UniqueLock with Mutex', () => {
   let mutex1: Mutex;
   let mutex2: Mutex;
   let mutex3: Mutex;
@@ -37,25 +37,25 @@ describe("UniqueLock with Mutex", () => {
     return value;
   }
 
-  test("async function lock same mutexes", async () => {
+  test('async function lock same mutexes', async () => {
     const length = 3;
     const results = await Promise.all(Array.from({ length }, asyncFunc));
     expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
   });
 
-  test("async function lock common mutexes", async () => {
+  test('async function lock common mutexes', async () => {
     const length = 2;
     const results = await Promise.all([asyncFunc(), asyncFunc2()]);
     expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
   });
 
-  test("lock three mutexes", async () => {
+  test('lock three mutexes', async () => {
     const length = 2;
     const results = await Promise.all(Array.from({ length }, asyncFunc3));
     expect(results.sort()).toEqual(Array.from({ length }, (_, k) => k + 1));
   });
 
-  test("lock 0 mutex without error", async () => {
+  test('lock 0 mutex without error', async () => {
     const mutexes: MutexInterface[] = [];
     using _ = await ScopedLock.create(...mutexes);
   });

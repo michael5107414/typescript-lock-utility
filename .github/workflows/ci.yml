@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
       - ".github/workflows/ci.yml"
       - "src/**"
@@ -11,7 +11,7 @@ on:
       - "jest.config.mjs"
       - "tsconfig.json"
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
       - ".github/workflows/ci.yml"
       - "src/**"

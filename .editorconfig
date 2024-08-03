@@ -8,3 +8,6 @@ max_line_length = 120
 [*.{js,mjs,ts,mts,json}]
 indent_style = space
 indent_size = 2
+
+[*.{js,mjs,ts,mts}]
+quote_type = single

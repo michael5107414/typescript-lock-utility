@@ -1,4 +1,4 @@
-import type { BasicLockableInteface } from "./types";
+import type { BasicLockableInteface } from './types';
 
 /**
  * ConditionVariable is a synchronization primitive that allows caller to wait until a particular condition is met.
@@ -29,7 +29,7 @@ export class ConditionVariable {
    */
   async wait(lock: BasicLockableInteface, predicate?: () => boolean | Promise<boolean>): Promise<void> {
     if (!lock.ownsLock()) {
-      throw new Error("lock should own the lock by calling wait");
+      throw new Error('lock should own the lock by calling wait');
     }
 
     if (!predicate) {

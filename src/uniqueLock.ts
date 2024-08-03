@@ -1,5 +1,5 @@
-import type { LockStrategy } from "./lockOptions";
-import type { MutexInterface } from "./types";
+import type { LockStrategy } from './lockOptions';
+import type { MutexInterface } from './types';
 
 /**
  * UniqueLock is a synchronization primitive that allows only one caller to lock it.
@@ -19,16 +19,16 @@ export class UniqueLock implements Disposable {
    *
    * usage: using lock = await UniqueLock.create(mutex);
    */
-  static async create(mutex: MutexInterface, strategy: LockStrategy = "instant_lock"): Promise<UniqueLock> {
+  static async create(mutex: MutexInterface, strategy: LockStrategy = 'instant_lock'): Promise<UniqueLock> {
     const uniqueLock = new UniqueLock(mutex);
     switch (strategy) {
-      case "instant_lock":
+      case 'instant_lock':
         await uniqueLock.lock();
         break;
-      case "try_to_lock":
+      case 'try_to_lock':
         uniqueLock.tryLock();
         break;
-      case "adopt_lock":
+      case 'adopt_lock':
         uniqueLock._owns = true;
     }
     return uniqueLock;
@@ -47,9 +47,9 @@ export class UniqueLock implements Disposable {
    */
   async lock(): Promise<void> {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     } else if (this.ownsLock()) {
-      throw new Error("lock already acquired");
+      throw new Error('lock already acquired');
     }
     await this._mutex.lock();
     this._owns = true;
@@ -62,9 +62,9 @@ export class UniqueLock implements Disposable {
    */
   tryLock(): boolean {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     } else if (this.ownsLock()) {
-      throw new Error("lock already acquired");
+      throw new Error('lock already acquired');
     }
     this._owns = this._mutex.tryLock();
     return this._owns;
@@ -76,9 +76,9 @@ export class UniqueLock implements Disposable {
    */
   unlock(): void {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     } else if (!this.ownsLock()) {
-      throw new Error("lock already freed");
+      throw new Error('lock already freed');
     }
     this._mutex.unlock();
     this._owns = false;
@@ -91,7 +91,7 @@ export class UniqueLock implements Disposable {
    */
   release(): MutexInterface {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     }
     const ret = this._mutex;
     this._mutex = undefined;

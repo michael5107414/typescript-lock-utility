@@ -1,5 +1,5 @@
-import type { MutexInterface } from "./types";
-import { UniqueLock } from "./uniqueLock";
+import type { MutexInterface } from './types';
+import { UniqueLock } from './uniqueLock';
 
 /**
  * Lock multiple mutex at once and using a deadlock avoidance algorithm to avoid deadlock.
@@ -13,7 +13,7 @@ export async function lock(...mutexes: MutexInterface[]): Promise<void> {
 
   // cannot use keyword using for this case
   // thus use const instead (Symbol.dispose won't be triggered)
-  const lockList = await Promise.all([...mutexes.map((mtx) => UniqueLock.create(mtx, "defer_lock"))]);
+  const lockList = await Promise.all([...mutexes.map((mtx) => UniqueLock.create(mtx, 'defer_lock'))]);
 
   let startIdx = 0;
 

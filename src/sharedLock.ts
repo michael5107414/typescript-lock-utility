@@ -1,5 +1,5 @@
-import type { LockStrategy } from "./lockOptions";
-import type { SharedMutexInterface } from "./types";
+import type { LockStrategy } from './lockOptions';
+import type { SharedMutexInterface } from './types';
 
 /**
  * SharedLock is a synchronization primitive that allows multiple callers to lock a shared resource.
@@ -20,16 +20,16 @@ export class SharedLock implements Disposable {
    *
    * usage: using lock = await SharedLock.create(mutex);
    */
-  static async create(mutex: SharedMutexInterface, strategy: LockStrategy = "instant_lock"): Promise<SharedLock> {
+  static async create(mutex: SharedMutexInterface, strategy: LockStrategy = 'instant_lock'): Promise<SharedLock> {
     const sharedLock = new SharedLock(mutex);
     switch (strategy) {
-      case "instant_lock":
+      case 'instant_lock':
         await sharedLock.lock();
         break;
-      case "try_to_lock":
+      case 'try_to_lock':
         sharedLock.tryLock();
         break;
-      case "adopt_lock":
+      case 'adopt_lock':
         sharedLock._owns = true;
     }
     return sharedLock;
@@ -48,9 +48,9 @@ export class SharedLock implements Disposable {
    */
   async lock(): Promise<void> {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     } else if (this.ownsLock()) {
-      throw new Error("lock already acquired");
+      throw new Error('lock already acquired');
     }
     await this._mutex.lockShared();
     this._owns = true;
@@ -63,9 +63,9 @@ export class SharedLock implements Disposable {
    */
   tryLock(): boolean {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     } else if (this.ownsLock()) {
-      throw new Error("lock already acquired");
+      throw new Error('lock already acquired');
     }
     this._owns = this._mutex.tryLockShared();
     return this._owns;
@@ -77,9 +77,9 @@ export class SharedLock implements Disposable {
    */
   unlock(): void {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     } else if (!this.ownsLock()) {
-      throw new Error("lock already freed");
+      throw new Error('lock already freed');
     }
     this._mutex.unlockShared();
     this._owns = false;
@@ -92,7 +92,7 @@ export class SharedLock implements Disposable {
    */
   release(): SharedMutexInterface {
     if (!this._mutex) {
-      throw new Error("mutex is not set");
+      throw new Error('mutex is not set');
     }
     const ret = this._mutex;
     this._mutex = undefined;
