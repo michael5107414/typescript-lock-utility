@@ -26,7 +26,6 @@ export class ScopedLock implements Disposable {
     this._mutexes = _mutexes;
   }
 
-  // @internal
   [Symbol.dispose](): void {
     this._mutexes.forEach((mtx) => mtx.unlock());
   }

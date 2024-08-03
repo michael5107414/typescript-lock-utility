@@ -108,7 +108,6 @@ export class SharedLock implements Disposable {
     return this._owns;
   }
 
-  // @internal
   [Symbol.dispose](): void {
     if (this._mutex && this.ownsLock()) {
       this._mutex.unlockShared();
