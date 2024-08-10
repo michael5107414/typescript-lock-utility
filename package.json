@@ -10,7 +10,6 @@
     "node": "^18.18 || ^20.9 || >=21.1"
   },
   "files": [
-    "src",
     "dist"
   ],
   "packageManager": "yarn@4.3.1",
